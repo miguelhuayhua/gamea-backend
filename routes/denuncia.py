@@ -1,6 +1,10 @@
 from database.AdultoMayor import insertAdulto
+from database.Domicilio import insertDomicilio
+from database.Denunciado import insertDenunciado
+from database.Hijo import insertHijo
+from database.Caso import insertCaso
 from fastapi import APIRouter, Request
-
+from database.conexion import session
 routerDenuncia = APIRouter()
 # funciones de modelos de la base de datos
 
@@ -12,15 +16,23 @@ async def insertDenuncia(request: Request):
     try:
         data = await request.json()
         datosGenerales = data.get('datosGenerales')
-        await insertAdulto(datosGenerales)
+        id_adulto = await insertAdulto(datosGenerales)
+        await insertHijo(datosGenerales.get('hijos'), id_adulto)
         datosUbicacion = data.get('datosUbicacion')
-        datosDenunciado = data.get('datosDenunciado')
+        await insertDomicilio(datosUbicacion, id_adulto)
+        # datos a colocar en Caso
         descripcionHechos = data.get('descripcionHechos')
         descripcionPeticion = data.get('descripcionPeticion')
-        accionesRealizadas = data.get('accionesRealizadas')
+        accionRealizada = data.get('accionRealizada')
         datosDenuncia = data.get('datosDenuncia')
-        return {"response": "Los datos se han registrado correctamente..."}
-
+        datosDenuncia['peticion'] = descripcionPeticion
+        datosDenuncia['descripcion_hechos'] = descripcionHechos
+        datosDenuncia['accion_realizada'] = accionRealizada
+        id_caso = await insertCaso(datosDenuncia, id_adulto)
+        datosDenunciado = data.get('datosDenunciado')
+        await insertDenunciado(datosDenunciado, id_caso)
+        session.close_all()
+        return {"response": "Los datos se han registrado correctamente...", "status": 1}
     except Exception as e:
         print(e)
-        return {"response": "Ha ocurrido un error en el servidor..."}
+        return {"response": "Ha ocurrido un error en el servidor...", "status": 0}

@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database.conexion import database
 # importamos todas las rutas que creamos en la carpeta "routes"
 from routes.adulto import routerAdulto
 from routes.denuncia import routerDenuncia
@@ -20,15 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.on_event('startup')
-async def startup():
-    await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 # colocado de las rutas en la aplicación principal
 app.include_router(routerAdulto, prefix='/adulto')

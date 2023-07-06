@@ -16,7 +16,6 @@ async def insertAdulto(data):
     grado = data.get('grado')
     beneficios = data.get('beneficios')
     ocupacion = data.get('ocupacion')
-    print('en ejecución')
     await database.execute(
         query="""INSERT INTO adulto_mayor (nombre, paterno, materno, edad, ci, genero, f_nacimiento, estado_civil, nro_referencia, ocupacion, beneficios)
           VALUES (:nombre, :paterno, :materno, :edad, :ci, :genero, :fecha_nac , :estado_civil, :referencia, :ocupacion, :beneficios ) """,

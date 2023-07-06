@@ -1,30 +1,36 @@
 # base de datos
-from database.conexion import database
-from datetime import date
+
+from dateutil.parser import parse
+from database.conexion import session, engine
+from models.AdultoMayor import AdultoMayor
 
 
 async def insertAdulto(data):
     ci = data.get('ci')
     edad = data.get('edad')
     estado_civil = data.get('estado_civil')
-    fecha_nac = data.get('fecha_nac')
+    f_nacimiento = parse(data.get('fecha_nac')).date()
     materno = data.get('materno')
     paterno = data.get('paterno')
     nombre = data.get('nombre')
-    referencia = data.get('referencia')
+    nro_referencia = data.get('referencia')
     genero = data.get('sexo')
-    grado = data.get('grado')
     beneficios = data.get('beneficios')
     ocupacion = data.get('ocupacion')
-    print('en ejecución')
-    await database.execute(
-        query="""INSERT INTO adulto_mayor (nombre, paterno, materno, edad, ci, genero, f_nacimiento, estado_civil, nro_referencia, ocupacion, beneficios)
-          VALUES (:nombre, :paterno, :materno, :edad, :ci, :genero, :fecha_nac , :estado_civil, :referencia, :ocupacion, :beneficios ) """,
-        values={'nombre': nombre, 'paterno': paterno, 'materno': materno, 'edad': edad, 'ci': ci, 'genero': genero,
-                'fecha_nac': date.fromisoformat(fecha_nac), 'estado_civil': estado_civil, 'referencia': referencia, 'ocupacion': ocupacion, 'beneficios': beneficios})
-    database.force_rollback()
+    adultoMayor = AdultoMayor(id_adulto=AdultoMayor.generate_id(), ci=ci, edad=edad, estado_civil=estado_civil, f_nacimiento=f_nacimiento,  paterno=paterno,
+                              materno=materno,
+                              nombre=nombre, nro_referencia=nro_referencia, genero=genero,  beneficios=beneficios,
+                              ocupacion=ocupacion)
+
+    session.add(adultoMayor)
+    session.commit()
+    return adultoMayor.id_adulto
 
 
-async def listar():
-    datos = await database.fetch_all('SELECT * FROM adulto_mayor')
-    return datos
+async def listarAdulto():
+    adultos = session.query(AdultoMayor).all()
+    return adultos
+
+
+async def getUltimoAdulto():
+    return None
