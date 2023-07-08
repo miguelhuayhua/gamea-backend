@@ -1,8 +1,9 @@
-from database.AdultoMayor import listarAdulto, insertAdulto
+from database.AdultoMayor import listarAdulto, getAdulto
 from models.AdultoMayor import AdultoMayor
-from fastapi import APIRouter
+from database.Hijo import getHijosByIdAdulto
+from fastapi import APIRouter, Request
 import pandas as pd
-import json
+from database.conexion import session
 routerAdulto = APIRouter()
 
 
@@ -12,14 +13,30 @@ routerAdulto = APIRouter()
 @routerAdulto.get('/npmunicos')
 async def all():
     data = await listarAdulto()
+    print(data)
     dictAdulto = []
     for adulto in data:
         dict = adulto.__dict__
         dict.pop('_sa_instance_state')
         dictAdulto.append(dict)
     dataframe = pd.DataFrame.from_records(dictAdulto)
-    nombres = dataframe['nombre'].unique()
-    paterno = dataframe['paterno'].unique()
-    materno = dataframe['materno'].unique()
+    if (len(data) != 0):
+        nombres = dataframe['nombre'].unique()
+        paterno = dataframe['paterno']
+        materno = dataframe['materno']
+        apellidos = pd.concat([paterno, materno], axis=0).unique()
+        session.close()
+        return {'nombres': nombres.tolist(), 'apellidos': apellidos.tolist()}
+    else:
+        return {'nombres': [], 'apellidos':[]}
 
-    return {'nombres': nombres.tolist(), 'paterno': paterno.tolist(), 'materno': materno.tolist()}
+
+@routerAdulto.post('/obtener')
+async def obtenerAdulto(request: Request):
+    data = await request.json()
+    id_adulto  = data.get('id_adulto')
+    print(id_adulto)
+    adulto = await getAdulto(id_adulto=id_adulto)
+    hijos = await getHijosByIdAdulto(adulto.id_adulto)
+    
+    return {"adulto":adulto, "hijos":hijos}

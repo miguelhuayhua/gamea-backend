@@ -13,7 +13,6 @@ class Hijo(Base):
     ult_modificacion = Column(DateTime, default=func.now())
     estado = Column(Integer, default=1)
     id_adulto = Column(String)
-
     @classmethod
     def generate_id(cls):
         next_value = engine.execute(

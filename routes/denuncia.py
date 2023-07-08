@@ -31,7 +31,7 @@ async def insertDenuncia(request: Request):
         id_caso = await insertCaso(datosDenuncia, id_adulto)
         datosDenunciado = data.get('datosDenunciado')
         await insertDenunciado(datosDenunciado, id_caso)
-        session.close_all()
+        session.close()
         return {"response": "Los datos se han registrado correctamente...", "status": 1}
     except Exception as e:
         print(e)

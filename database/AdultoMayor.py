@@ -1,18 +1,19 @@
 # base de datos
 
 from dateutil.parser import parse
+from fastapi import Request
 from database.conexion import session, engine
 from models.AdultoMayor import AdultoMayor
-
-
+from models.Hijo import Hijo
+from sqlalchemy.orm import joinedload
 async def insertAdulto(data):
     ci = data.get('ci')
     edad = data.get('edad')
     estado_civil = data.get('estado_civil')
     f_nacimiento = parse(data.get('fecha_nac')).date()
-    materno = data.get('materno')
-    paterno = data.get('paterno')
-    nombre = data.get('nombre')
+    materno = data.get('materno').strip().capitalize()
+    paterno = data.get('paterno').strip().capitalize()
+    nombre = data.get('nombre').strip().capitalize()
     nro_referencia = data.get('referencia')
     genero = data.get('sexo')
     beneficios = data.get('beneficios')
@@ -34,3 +35,8 @@ async def listarAdulto():
 
 async def getUltimoAdulto():
     return None
+
+async def getAdulto(id_adulto)->AdultoMayor:
+    adulto = session.query(AdultoMayor).filter_by(id_adulto = id_adulto).first()
+    print(adulto)
+    return adulto

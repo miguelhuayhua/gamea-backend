@@ -3,7 +3,7 @@
 from dateutil.parser import parse
 from database.conexion import session
 from models.Caso import Caso
-
+from sqlalchemy import desc
 
 async def insertCaso(data, id_adulto):
     fecha_registro = data.get('fecha')
@@ -26,3 +26,19 @@ async def insertCaso(data, id_adulto):
     session.add(caso)
     session.commit()
     return caso.id_caso
+
+
+async def getUltimoCaso():
+    return session.query(Caso).order_by(desc(Caso.id_caso)).first()
+
+async def allCasos():
+    return session.query(Caso).order_by(Caso.id_caso).all()
+
+async def cambiarEstado(id_caso):
+    caso = session.query(Caso).filter_by(id_caso = id_caso).first()
+    if caso.estado ==0:
+        caso.estado = 1
+    else :
+        caso.estado= 0
+    session.commit()
+    return True

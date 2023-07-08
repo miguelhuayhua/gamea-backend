@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, DateTime, func,  select
 from database.conexion import engine
-
+from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 
@@ -21,7 +21,6 @@ class AdultoMayor(Base):
     beneficios = Column(String)
     estado = Column(Integer, default=1)
     ult_modificacion = Column(DateTime, default=func.now())
-
     @classmethod
     def generate_id(cls):
         next_value = engine.execute(
