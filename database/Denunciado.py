@@ -5,9 +5,9 @@ from models.Denunciado import Denunciado
 
 
 async def insertDenunciado(data, id_caso):
-    materno = data.get('materno').strip()
-    paterno = data.get('paterno').strip()
-    nombres = data.get('nombres').strip()
+    materno = data.get('materno').strip().capitalize()
+    paterno = data.get('paterno').strip().capitalize()
+    nombres = data.get('nombres').strip().capitalize()
     parentezco = data.get('parentezco')
     denunciado = Denunciado(id_denunciado=Denunciado.generate_id(), paterno=paterno,
                             materno=materno,

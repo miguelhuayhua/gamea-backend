@@ -6,6 +6,8 @@ from database.conexion import session, engine
 from models.AdultoMayor import AdultoMayor
 from models.Hijo import Hijo
 from sqlalchemy.orm import joinedload
+
+from sqlalchemy import and_ ,not_
 async def insertAdulto(data):
     ci = data.get('ci')
     edad = data.get('edad')
@@ -38,5 +40,4 @@ async def getUltimoAdulto():
 
 async def getAdulto(id_adulto)->AdultoMayor:
     adulto = session.query(AdultoMayor).filter_by(id_adulto = id_adulto).first()
-    print(adulto)
     return adulto

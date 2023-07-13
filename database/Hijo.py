@@ -18,3 +18,7 @@ async def insertHijo(hijos, id_adulto):
 async def getHijosByIdAdulto(id_adulto):
     hijos = session.query(Hijo).filter_by(id_adulto=id_adulto).all()
     return hijos
+
+
+async def listarHijos():
+    return session.query(Hijo).all()

@@ -13,7 +13,6 @@ routerAdulto = APIRouter()
 @routerAdulto.get('/npmunicos')
 async def all():
     data = await listarAdulto()
-    print(data)
     dictAdulto = []
     for adulto in data:
         dict = adulto.__dict__
@@ -24,7 +23,9 @@ async def all():
         nombres = dataframe['nombre'].unique()
         paterno = dataframe['paterno']
         materno = dataframe['materno']
+        nombres = nombres[nombres!='']
         apellidos = pd.concat([paterno, materno], axis=0).unique()
+        apellidos = apellidos[apellidos !='']
         session.close()
         return {'nombres': nombres.tolist(), 'apellidos': apellidos.tolist()}
     else:
@@ -35,7 +36,6 @@ async def all():
 async def obtenerAdulto(request: Request):
     data = await request.json()
     id_adulto  = data.get('id_adulto')
-    print(id_adulto)
     adulto = await getAdulto(id_adulto=id_adulto)
     hijos = await getHijosByIdAdulto(adulto.id_adulto)
     

@@ -25,5 +25,5 @@ async def insertDomicilio(data, id_adulto):
     return domicilio.id_domicilio
 
 
-async def listar():
-    return None
+async def listarDomicilio():
+    return session.query(Domicilio).all()
