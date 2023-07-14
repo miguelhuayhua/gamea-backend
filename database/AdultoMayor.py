@@ -31,7 +31,7 @@ async def insertAdulto(data):
 
 
 async def listarAdulto():
-    adultos = session.query(AdultoMayor).all()
+    adultos = session.query(AdultoMayor).order_by(AdultoMayor.id_adulto).all()
     return adultos
 
 
@@ -41,3 +41,12 @@ async def getUltimoAdulto():
 async def getAdulto(id_adulto)->AdultoMayor:
     adulto = session.query(AdultoMayor).filter_by(id_adulto = id_adulto).first()
     return adulto
+
+async def cambiarEstado(id_adulto):
+    adulto = session.query(AdultoMayor).filter_by(id_adulto = id_adulto).first()
+    if adulto.estado ==0:
+        adulto.estado = 1
+    else :
+        adulto.estado= 0
+    session.commit()
+    return True

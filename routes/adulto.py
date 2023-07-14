@@ -1,5 +1,4 @@
-from database.AdultoMayor import listarAdulto, getAdulto
-from models.AdultoMayor import AdultoMayor
+from database.AdultoMayor import listarAdulto, getAdulto, cambiarEstado
 from database.Hijo import getHijosByIdAdulto
 from fastapi import APIRouter, Request
 import pandas as pd
@@ -38,5 +37,24 @@ async def obtenerAdulto(request: Request):
     id_adulto  = data.get('id_adulto')
     adulto = await getAdulto(id_adulto=id_adulto)
     hijos = await getHijosByIdAdulto(adulto.id_adulto)
-    
+    session.close()
     return {"adulto":adulto, "hijos":hijos}
+
+
+@routerAdulto.get('/all')
+async def allAdultos():
+    adultos = await listarAdulto()
+    session.close()
+    return adultos
+
+@routerAdulto.post('/estado')
+async def changeEstado(request:Request):
+    try:
+        data = await request.json()
+        id_adulto = data.get('id_adulto')
+        await cambiarEstado(id_adulto)
+        session.close()
+        return {"status":1}
+    except:
+        return {"status":0}
+    

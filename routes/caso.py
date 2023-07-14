@@ -4,7 +4,10 @@ from database.Domicilio import listarDomicilio
 from database.Hijo import listarHijos
 from fastapi import APIRouter, Request
 from database.conexion import session
+from pytz import timezone
 import pandas as pd
+
+
 routerCaso = APIRouter()
 
 
@@ -69,4 +72,12 @@ async def reportCaso():
         adultos.append(dict)
     dataframeAdultos = pd.DataFrame.from_records(adultos)
     print(dataframeAdultos)
+    unido1 = pd.merge(dataframeAdultos, dataframeCasos, on="id_adulto", how="inner")
+    bolivia_time = timezone('America/La_Paz')
+    unido1['ult_modificacion_y'] = unido1['ult_modificacion_y'].dt.tz_convert(bolivia_time)
+    writer = pd.ExcelWriter('archivo.xlsx', engine='xlsxwriter')
+    unido1.to_excel(excel_writer=writer, sheet_name='hoja1', index=False)
+    
+    
+    
     return None
