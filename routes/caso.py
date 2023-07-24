@@ -4,7 +4,9 @@ from database.Domicilio import listarDomicilio
 from database.Hijo import listarHijos
 from fastapi import APIRouter, Request
 from database.conexion import session
-from pytz import timezone
+from fastapi.responses import FileResponse
+import tempfile
+
 import pandas as pd
 
 
@@ -55,15 +57,12 @@ async def reportCaso():
         dict.pop('_sa_instance_state')
         casos.append(dict)
     dataframeCasos = pd.DataFrame.from_records(casos)
-    print(dataframeCasos)
     dataHijos = await listarHijos()
     hijos = []
     for hijo in dataHijos:
         dict = hijo.__dict__
         dict.pop('_sa_instance_state')
         hijos.append(dict)
-    dataframeHijos = pd.DataFrame.from_records(hijos)
-    print(dataframeHijos)
     dataAdultos = await listarAdulto()
     adultos = []
     for adulto in dataAdultos:
@@ -71,13 +70,16 @@ async def reportCaso():
         dict.pop('_sa_instance_state')
         adultos.append(dict)
     dataframeAdultos = pd.DataFrame.from_records(adultos)
-    print(dataframeAdultos)
     unido1 = pd.merge(dataframeAdultos, dataframeCasos, on="id_adulto", how="inner")
-    bolivia_time = timezone('America/La_Paz')
-    unido1['ult_modificacion_y'] = unido1['ult_modificacion_y'].dt.tz_convert(bolivia_time)
-    writer = pd.ExcelWriter('archivo.xlsx', engine='xlsxwriter')
-    unido1.to_excel(excel_writer=writer, sheet_name='hoja1', index=False)
-    
-    
-    
-    return None
+    unido1['nro_referencia'] = unido1['nro_referencia'].astype(str)
+    unido1['ult_modificacion_y'] = unido1['ult_modificacion_y'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    unido1['ult_modificacion_x'] = unido1['ult_modificacion_x'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    unido1['f_nacimiento'] = pd.to_datetime(unido1['f_nacimiento'], format='%Y-%m-%d').dt.strftime('%Y-%m-%d')
+    unido1.reindex(['nombre, paterno, materno'])
+      # Crea un archivo temporal
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Guarda el DataFrame en el archivo temporal en formato Excel
+        unido1.to_excel(temp_file.name, sheet_name='hoja1', index=False, engine='xlsxwriter')
+
+    # Envía el archivo como respuesta utilizando FileResponse
+    return FileResponse(temp_file.name, filename='archivo.xlsx')

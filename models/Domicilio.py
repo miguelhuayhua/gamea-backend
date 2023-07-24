@@ -16,6 +16,8 @@ class Domicilio(Base):
     area = Column(String)
     otra_area = Column(String)
     actual = Column(Integer, default=1)
+    tipo_domicilio = Column(String)
+    otro_domicilio = Column(String)
     ult_modificacion = Column(DateTime, default=func.now())
     estado = Column(Integer, default=1)
 

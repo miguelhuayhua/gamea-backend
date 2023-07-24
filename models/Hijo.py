@@ -10,6 +10,7 @@ class Hijo(Base):
     __tablename__ = 'hijo'
     id_hijo = Column(String, primary_key=True)
     nombres_apellidos = Column(String)
+    genero = Column(String)
     ult_modificacion = Column(DateTime, default=func.now())
     estado = Column(Integer, default=1)
     id_adulto = Column(String)

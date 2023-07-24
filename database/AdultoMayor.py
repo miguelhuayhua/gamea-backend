@@ -5,12 +5,13 @@ from fastapi import Request
 from database.conexion import session, engine
 from models.AdultoMayor import AdultoMayor
 from models.Hijo import Hijo
-from sqlalchemy.orm import joinedload
+from sqlalchemy import desc
 
-from sqlalchemy import and_ ,not_
+
 async def insertAdulto(data):
     ci = data.get('ci')
     edad = data.get('edad')
+    grado = data.get('grado')
     estado_civil = data.get('estado_civil')
     f_nacimiento = parse(data.get('fecha_nac')).date()
     materno = data.get('materno').strip().capitalize()
@@ -21,7 +22,7 @@ async def insertAdulto(data):
     beneficios = data.get('beneficios')
     ocupacion = data.get('ocupacion')
     adultoMayor = AdultoMayor(id_adulto=AdultoMayor.generate_id(), ci=ci, edad=edad, estado_civil=estado_civil, f_nacimiento=f_nacimiento,  paterno=paterno,
-                              materno=materno,
+                              materno=materno, grado=grado,
                               nombre=nombre, nro_referencia=nro_referencia, genero=genero,  beneficios=beneficios,
                               ocupacion=ocupacion)
 
@@ -31,7 +32,7 @@ async def insertAdulto(data):
 
 
 async def listarAdulto():
-    adultos = session.query(AdultoMayor).order_by(AdultoMayor.id_adulto).all()
+    adultos = session.query(AdultoMayor).order_by(desc(AdultoMayor.id_adulto)).all()
     return adultos
 
 
@@ -50,3 +51,34 @@ async def cambiarEstado(id_adulto):
         adulto.estado= 0
     session.commit()
     return True
+
+async def modificarAdulto(adulto):
+    ci = adulto.get('ci')
+    edad = adulto.get('edad')
+    grado = adulto.get('grado')
+    estado_civil = adulto.get('estado_civil')
+    f_nacimiento = parse(adulto.get('f_nacimiento')).date()
+    materno = adulto.get('materno').strip().capitalize()
+    paterno = adulto.get('paterno').strip().capitalize()
+    nombre = adulto.get('nombre').strip().capitalize()
+    nro_referencia = adulto.get('nro_referencia')
+    genero = adulto.get('genero')
+    beneficios = adulto.get('beneficios')
+    ocupacion = adulto.get('ocupacion')
+    adultoUpdated = session.query(AdultoMayor).filter_by(id_adulto=adulto.get('id_adulto')).first()
+    adultoUpdated.nombre = nombre
+    adultoUpdated.paterno = paterno
+    adultoUpdated.ci = ci
+    adultoUpdated.edad = edad
+    adultoUpdated.grado = grado
+    adultoUpdated.estado_civil = estado_civil
+    adultoUpdated.f_nacimiento = f_nacimiento
+    adultoUpdated.materno = materno
+    adultoUpdated.nro_referencia = nro_referencia
+    adultoUpdated.genero = genero
+    adultoUpdated.beneficios = beneficios
+    adultoUpdated.ocupacion = ocupacion
+    session.commit()
+    return adultoUpdated.id_adulto
+ 
+

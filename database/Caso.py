@@ -46,8 +46,6 @@ async def cambiarEstado(id_caso):
 
 async def modificarCaso(caso):
     try:
-        print(caso.get('descripcion_hechos'))
-        print(caso.get('id_caso'))
         casoUpdated = session.query(Caso).filter_by(id_caso=caso.get('id_caso')).first()
         casoUpdated.descripcion_hechos = caso.get('descripcion_hechos')
         casoUpdated.peticion = caso.get('peticion')

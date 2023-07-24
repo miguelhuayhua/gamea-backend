@@ -19,6 +19,7 @@ class AdultoMayor(Base):
     nro_referencia = Column(Integer)
     ocupacion = Column(String)
     beneficios = Column(String)
+    grado = Column(String)
     estado = Column(Integer, default=1)
     ult_modificacion = Column(DateTime, default=func.now())
     @classmethod

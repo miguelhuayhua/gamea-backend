@@ -1,4 +1,4 @@
-from database.AdultoMayor import listarAdulto, getAdulto, cambiarEstado
+from database.AdultoMayor import listarAdulto, getAdulto, cambiarEstado, modificarAdulto
 from database.Hijo import getHijosByIdAdulto
 from fastapi import APIRouter, Request
 import pandas as pd
@@ -58,3 +58,14 @@ async def changeEstado(request:Request):
     except:
         return {"status":0}
     
+
+
+@routerAdulto.post('/update')
+async def updateAdulto(request:Request):
+    try:
+        adulto = await request.json()
+        await modificarAdulto(adulto=adulto)
+        session.close()
+        return {"status":1}
+    except:
+        return {"status":0}

@@ -1,5 +1,5 @@
 from database.AdultoMayor import insertAdulto
-from database.Domicilio import insertDomicilio
+from database.Domicilio import insertarDomicilio
 from database.Denunciado import insertDenunciado
 from database.Hijo import insertHijo
 from database.Caso import insertCaso
@@ -19,7 +19,7 @@ async def insertDenuncia(request: Request):
         id_adulto = await insertAdulto(datosGenerales)
         await insertHijo(datosGenerales.get('hijos'), id_adulto)
         datosUbicacion = data.get('datosUbicacion')
-        await insertDomicilio(datosUbicacion, id_adulto)
+        await insertarDomicilio(datosUbicacion, id_adulto)
         # datos a colocar en Caso
         descripcionHechos = data.get('descripcionHechos')
         descripcionPeticion = data.get('descripcionPeticion')

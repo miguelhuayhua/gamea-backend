@@ -11,6 +11,7 @@ class Denunciado(Base):
     nombres = Column(String)
     paterno = Column(String)
     materno = Column(String)
+    genero = Column(String)
     parentezco = Column(String)
     estado = Column(Integer, default=1)
     ult_modificacion = Column(DateTime, default=func.now())
