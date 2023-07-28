@@ -1,15 +1,18 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 # importamos todas las rutas que creamos en la carpeta "routes"
 from routes.adulto import routerAdulto
 from routes.denuncia import routerDenuncia
 from routes.caso import routerCaso
 from routes.denunciado import routerDenunciado
 from routes.domicilio import routerDomicilio
+from routes.usuario import routerUsuario
+from routes.persona import routerPersona
 from routes.hijo import routerHijo
 app = FastAPI()
-
-
 origins = [
     "http://localhost:3000",
     "http://localhost:8080",
@@ -32,3 +35,11 @@ app.include_router(routerCaso, prefix='/caso')
 app.include_router(routerDenunciado, prefix='/denunciado')
 app.include_router(routerDomicilio, prefix='/domicilio')
 app.include_router(routerHijo, prefix='/hijo')
+app.include_router(routerPersona , prefix='/persona')
+app.include_router(routerUsuario , prefix='/usuario')
+
+app.mount("/public", StaticFiles(directory=os.path.join(os.getcwd(), "public")), name="public")
+@app.get("/static/images/{image_name}")
+def get_image_url(image_name:str):
+    image_path = os.path.join(os.getcwd(), "public/usersimg", image_name)
+    return FileResponse(image_path)

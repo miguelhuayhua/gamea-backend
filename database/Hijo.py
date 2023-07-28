@@ -49,10 +49,11 @@ async def cambiarEstado(id_hijo):
     return True
 
 async def modificarHijo(hijo):
-    nombre_apellidos = hijo.get('nombres_apellidos')
+    print(hijo)
+    nombres_apellidos = hijo.get('nombres_apellidos')
     genero = hijo.get('genero')
     hijoUpdated = session.query(Hijo).filter_by(id_hijo=hijo.get('id_hijo')).first()
-    hijoUpdated.nombre_apellidos = nombre_apellidos
+    hijoUpdated.nombres_apellidos = nombres_apellidos
     hijoUpdated.genero = genero
     session.commit()
     return hijoUpdated.id_hijo

@@ -1,5 +1,6 @@
 # base de datos
 
+import datetime
 from dateutil.parser import parse
 from fastapi import Request
 from database.conexion import session, engine
@@ -78,6 +79,7 @@ async def modificarAdulto(adulto):
     adultoUpdated.genero = genero
     adultoUpdated.beneficios = beneficios
     adultoUpdated.ocupacion = ocupacion
+    adultoUpdated.ult_modificacion = datetime.datetime.now()
     session.commit()
     return adultoUpdated.id_adulto
  

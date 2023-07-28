@@ -31,7 +31,7 @@ async def all():
         return {'nombres': [], 'apellidos':[]}
 
 
-@routerAdulto.post('/obtener')
+@routerAdulto.post('/get')
 async def obtenerAdulto(request: Request):
     data = await request.json()
     id_adulto  = data.get('id_adulto')

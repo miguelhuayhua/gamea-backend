@@ -8,7 +8,7 @@ routerDomicilio = APIRouter()
 # creamos las diferentes rutas de manejo para cada caso
 
 
-@routerDomicilio.post('/obtener')
+@routerDomicilio.post('/get')
 async def obtenerDomicilio(request: Request):
     data = await request.json()
     id_adulto  = data.get('id_adulto')

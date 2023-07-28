@@ -12,7 +12,7 @@ routerHijo = APIRouter()
 
 
 
-@routerHijo.post('/obtener')
+@routerHijo.post('/get')
 async def obtenerHijo(request: Request):
     data = await request.json()
     id_hijo  = data.get('id_hijo')
@@ -42,9 +42,10 @@ async def changeEstado(request:Request):
 @routerHijo.post('/update')
 async def updateHijo(request:Request):
     try:
-        Hijo = await request.json()
-        await modificarHijo(Hijo=Hijo)
+        hijo = await request.json()
+        await modificarHijo(hijo = hijo)
         session.close()
         return {"status":1}
-    except:
+    except Exception as e:
+        print(e)
         return {"status":0}

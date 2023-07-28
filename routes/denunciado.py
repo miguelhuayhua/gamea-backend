@@ -6,7 +6,7 @@ routerDenunciado = APIRouter()
 
 
 
-@routerDenunciado.post('/obtener')
+@routerDenunciado.post('/get')
 async def obtenerDenunciado(request:Request):
     try:
         data = await request.json()
@@ -18,7 +18,7 @@ async def obtenerDenunciado(request:Request):
         return {"status":0}
     
 
-@routerDenunciado.post('/obtenerById')
+@routerDenunciado.post('/getById')
 async def obtenerDenunciadoById(request:Request):
     try:
         data = await request.json()

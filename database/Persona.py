@@ -1,29 +1,67 @@
 # base de datos
-from database.conexion import database
-from datetime import date
 
+from dateutil.parser import parse
+from sqlalchemy import desc
+from database.conexion import session
+from models.Persona import Persona
 
-async def insertAdulto(data):
+import genderize
+
+async def insertPersona(data):
+    nombres = data.get('nombres').capitalize()
+    paterno = data.get('paterno').capitalize()
+    materno = data.get('materno').capitalize()
     ci = data.get('ci')
-    edad = data.get('edad')
-    estado_civil = data.get('estado_civil')
-    fecha_nac = data.get('fecha_nac')
-    materno = data.get('materno')
-    paterno = data.get('paterno')
-    nombre = data.get('nombre')
-    referencia = data.get('referencia')
-    genero = data.get('sexo')
-    grado = data.get('grado')
-    beneficios = data.get('beneficios')
-    ocupacion = data.get('ocupacion')
-    await database.execute(
-        query="""INSERT INTO adulto_mayor (nombre, paterno, materno, edad, ci, genero, f_nacimiento, estado_civil, nro_referencia, ocupacion, beneficios)
-          VALUES (:nombre, :paterno, :materno, :edad, :ci, :genero, :fecha_nac , :estado_civil, :referencia, :ocupacion, :beneficios ) """,
-        values={'nombre': nombre, 'paterno': paterno, 'materno': materno, 'edad': edad, 'ci': ci, 'genero': genero,
-                'fecha_nac': date.fromisoformat(fecha_nac), 'estado_civil': estado_civil, 'referencia': referencia, 'ocupacion': ocupacion, 'beneficios': beneficios})
-    database.force_rollback()
+    celular = data.get('celular')
+    f_nacimiento = data.get('f_nacimiento')
+    cargo = data.get('cargo')
+    genero = data.get('genero')
+    persona = Persona(nombres = nombres, paterno = paterno, materno = materno, ci = ci, celular = celular, f_nacimiento = f_nacimiento, cargo = cargo , genero = genero, id_persona = Persona.generate_id())
+    session.add(persona)
+    session.commit()
+    return persona.id_persona
+
+async def getPersonasByIdAdulto(id_adulto):
+    personas = session.query(Persona).filter_by(id_adulto=id_adulto).all()
+    return personas
 
 
-async def listar():
-    datos = await database.fetch_all('SELECT * FROM adulto_mayor')
-    return datos
+async def listarPersonas():
+    return session.query(Persona).order_by(desc(Persona.id_persona)).all()
+
+
+
+async def getPersona(id_persona)->Persona:
+    persona = session.query(Persona).filter_by(id_persona = id_persona).first()
+    return persona
+
+
+async def cambiarEstado(id_persona):
+    persona = session.query(Persona).filter_by(id_persona = id_persona).first()
+    if persona.estado ==0:
+        persona.estado = 1
+    else :
+        persona.estado= 0
+    session.commit()
+    return True
+
+async def modificarPersona(persona):
+    nombres = persona.get('nombres')
+    paterno = persona.get('paterno')
+    materno = persona.get('materno')
+    ci = persona.get('ci')
+    celular = persona.get('celular')
+    f_nacimiento = persona.get('f_nacimiento')
+    cargo = persona.get('cargo')
+    genero = persona.get('genero')
+    personaUpdated = session.query(Persona).filter_by(id_persona  = persona.get('id_persona')).first()
+    personaUpdated.nombres = nombres,
+    personaUpdated.paterno = paterno
+    personaUpdated.materno = materno
+    personaUpdated.ci = ci
+    personaUpdated.celular = celular
+    personaUpdated.f_nacimiento = f_nacimiento 
+    personaUpdated.cargo = cargo
+    session.commit()
+    return personaUpdated.id_persona
+ 
