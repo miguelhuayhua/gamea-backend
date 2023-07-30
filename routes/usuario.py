@@ -1,5 +1,5 @@
 
-from database.Usuario import insertUsuario, verifyUsuario, cambiarEstado, listarUsuarios, modificarUsuario,getUsuario
+from database.Usuario import insertUsuario, verifyUsuario, cambiarEstado, listarUsuarios, modificarUsuario,getUsuario, getByNameAndPassword
 from fastapi import APIRouter, Request
 import pandas as pd
 from database.conexion import session
@@ -15,8 +15,7 @@ routerUsuario = APIRouter()
 @routerUsuario.post('/verify')
 async def obtenerusuario(request: Request):
     data = await request.json()
-    nombre_usuario = data.get('usuario')
-    if await verifyUsuario(nombre_usuario):
+    if await verifyUsuario(usuario = data):
         return {"status":0}
     else:
         return {"status":1}
@@ -45,7 +44,7 @@ async def changeEstado(request:Request):
 @routerUsuario.post('/update')
 async def updateusuario(request:Request):
     try:
-        usuario = await request.json()
+        usuario = await request.form()
         await modificarUsuario(usuario = usuario)
         session.close()
         return {"status":1}
@@ -53,6 +52,18 @@ async def updateusuario(request:Request):
         print(e)
         return {"status":0}
     
+@routerUsuario.post('/get')
+async def obtenerUsuario(request: Request):
+    data = await request.json()
+    id_usuario  = data.get('id_usuario')
+    usuario = await getUsuario(id_usuario= id_usuario)
+    return usuario
+
+@routerUsuario.post('/auth')
+async def authUsuario(request: Request):
+    data = await request.json()
+    usuario = await getByNameAndPassword(data)
+    return usuario
 
 
 @routerUsuario.post('/insert')

@@ -10,6 +10,7 @@ async def insertUsuario(data):
     file_path = os.path.join(file.filename)
     file_path = file_path.replace(' ','')
     file_path = file_path.lower()
+    file_path = f'public/userimg/{file_path}'
     with open(file_path, "wb") as f:
         contents = await file.read()
         f.write(contents)
@@ -24,8 +25,18 @@ async def insertUsuario(data):
     return usuario.id_usuario
 
 async def verifyUsuario(usuario):
-    result = session.query(Usuario).filter_by(usuario = usuario).first()
-    return result
+    result = session.query(Usuario).filter_by(usuario = usuario.get('usuario')).first()
+    if(usuario.get('id_usuario')==""):
+        return result
+    else:
+        try:
+            usuarioExist = session.query(Usuario).filter_by(id_usuario = usuario.get('id_usuario')).first()
+            if(usuarioExist.usuario == result.usuario):
+                return None
+            else:
+                return usuarioExist
+        except Exception as e:
+            print(e)
     
 
 
@@ -49,22 +60,28 @@ async def cambiarEstado(id_usuario):
     return True
 
 async def modificarUsuario(usuario):
-    nombres = usuario.get('nombres')
-    paterno = usuario.get('paterno')
-    materno = usuario.get('materno')
-    ci = usuario.get('ci')
-    celular = usuario.get('celular')
-    f_nacimiento = usuario.get('f_nacimiento')
-    cargo = usuario.get('cargo')
-    genero = usuario.get('genero')
-    usuarioUpdated = session.query(Usuario).filter_by(id_usuario  = usuario.get('id_usuario')).first()
-    usuarioUpdated.nombres = nombres,
-    usuarioUpdated.paterno = paterno
-    usuarioUpdated.materno = materno
-    usuarioUpdated.ci = ci
-    usuarioUpdated.celular = celular
-    usuarioUpdated.f_nacimiento = f_nacimiento 
-    usuarioUpdated.cargo = cargo
+    id_usuario = usuario.get('id_usuario')
+    usuarioUpdated = session.query(Usuario).filter_by(id_usuario = id_usuario).first()
+    file = usuario.get('fotografia')
+    if(file != 'null'):
+        file_path = os.path.join(file.filename)
+        file_path = file_path.replace(' ','')
+        file_path = file_path.lower()
+        print(file_path)
+        with open('public/usersimg/'+file.filename, "wb") as f:
+            contents = await file.read()
+            f.write(contents)
+        usuarioUpdated.fotografia = f"/static/images/{file_path}", 
+    if(usuario.get('password')!=''):
+        usuarioUpdated.password = usuario.get('password')
+    usuarioUpdated.usuario = usuario.get('usuario')
     session.commit()
     return usuarioUpdated.id_usuario
  
+async def getByNameAndPassword(usuario):
+    password_bytes = usuario.get('password').encode('utf-8')
+    
+    usuario_name = usuario.get('usuario')
+    password = usuario.get('password')
+    result = session.query(Usuario).filter_by(usuario = usuario_name, password = password)
+    return result
