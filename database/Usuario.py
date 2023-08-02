@@ -4,7 +4,7 @@ from sqlalchemy import desc
 from database.conexion import session
 from models.Usuario import Usuario
 import os
-
+import bcrypt
 async def insertUsuario(data):
     file = data.get('fotografia')
     file_path = os.path.join(file.filename)
@@ -78,10 +78,20 @@ async def modificarUsuario(usuario):
     session.commit()
     return usuarioUpdated.id_usuario
  
-async def getByNameAndPassword(usuario):
-    password_bytes = usuario.get('password').encode('utf-8')
+async def getByNameAndPassword(usuario):    
     
     usuario_name = usuario.get('usuario')
     password = usuario.get('password')
-    result = session.query(Usuario).filter_by(usuario = usuario_name, password = password)
-    return result
+    result = None
+    if(usuario_name and password):
+        b_password = password.encode('utf-8')
+        result = session.query(Usuario).filter_by(usuario = usuario_name).first()
+        
+        if bcrypt.checkpw(b_password,result.password.encode('utf-8')):
+            result.password = None
+            return result
+        else: 
+        
+            return None
+    else:
+        return None
