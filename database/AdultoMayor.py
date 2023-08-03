@@ -10,11 +10,12 @@ from sqlalchemy import desc
 
 
 async def insertAdulto(data):
+    print('dentro de insert adulto')
     ci = data.get('ci')
     edad = data.get('edad')
     grado = data.get('grado')
     estado_civil = data.get('estado_civil')
-    f_nacimiento = parse(data.get('fecha_nac')).date()
+    f_nacimiento = parse(data.get('f_nacimiento')).date()
     materno = data.get('materno').strip().capitalize()
     paterno = data.get('paterno').strip().capitalize()
     nombre = data.get('nombre').strip().capitalize()
@@ -29,6 +30,7 @@ async def insertAdulto(data):
 
     session.add(adultoMayor)
     session.commit()
+    print('se añadió con éxito')
     return adultoMayor.id_adulto
 
 

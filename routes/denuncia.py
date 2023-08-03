@@ -14,6 +14,7 @@ routerDenuncia = APIRouter()
 @routerDenuncia.post('/insert')
 async def insertDenuncia(request: Request):
     try:
+        
         data = await request.json()
         datosGenerales = data.get('datosGenerales')
         id_adulto = await insertAdulto(datosGenerales)
