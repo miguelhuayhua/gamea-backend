@@ -13,6 +13,7 @@ class Persona(Base):
     paterno = Column(String)
     materno = Column(String)
     genero = Column(String)
+    profesion = Column(String)
     ci = Column(Integer)
     celular = Column(Integer)
     f_nacimiento = Column(Date)

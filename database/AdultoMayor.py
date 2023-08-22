@@ -10,7 +10,6 @@ from sqlalchemy import desc
 
 
 async def insertAdulto(data):
-    print('dentro de insert adulto')
     ci = data.get('ci')
     edad = data.get('edad')
     grado = data.get('grado')

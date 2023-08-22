@@ -1,8 +1,11 @@
-from database.Caso import getUltimoCaso, allCasos, cambiarEstado, modificarCaso
+from database.Caso import getUltimoCaso, allCasos, cambiarEstado, modificarCaso,getCaso
 from database.AdultoMayor import listarAdulto
-from database.Domicilio import listarDomicilio
+from database.Seguimiento import insertSeguimiento, allSeguimientoByCaso
 from database.Hijo import listarHijos
+from database.Citacion import allCitacionByCaso, insertCitacion
+from database.Citado import insertCitado
 from fastapi import APIRouter, Request
+
 from database.conexion import session
 from fastapi.responses import FileResponse
 import tempfile
@@ -19,6 +22,16 @@ async def allCaso():
     casos =  await allCasos()
     session.close()
     return casos
+
+
+@routerCaso.post('/get')
+async def obtenercaso(request: Request):
+    data = await request.json()
+    id_caso  = data.get('id_caso')
+    caso = await getCaso(id_caso=id_caso)
+    return caso
+
+
 
 @routerCaso.get('/getultimo')
 async def lastCaso():
@@ -83,3 +96,50 @@ async def reportCaso():
 
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')
+
+
+
+#SEGUIMIENTOS
+@routerCaso.post('/seguimiento/add')
+async def addCaso(request:Request):
+    try:
+        seguimiento = await request.json()
+        await insertSeguimiento(seguimiento, seguimiento.get('id_caso'))
+        session.close()
+        return {"status":1}
+    except:
+        return {"status":0}
+    
+@routerCaso.post('/seguimiento/all')
+async def allCaso(request:Request):
+    data= await request.json()
+    id_caso = data.get('id_caso')
+    seguimientos = await allSeguimientoByCaso(id_caso)
+    session.close()
+    return seguimientos
+
+
+#CITACIONES
+@routerCaso.post('/citacion/all')
+async def allCitacion(request:Request):
+    data = await request.json()
+    id_caso = data.get('id_caso')
+    citacions = await allCitacionByCaso(id_caso)
+    session.close()
+    return citacions
+
+@routerCaso.post('/citacion/add')
+async def addCitacion(request:Request):
+    try:
+        print(await request.json())
+        citacion = await request.json()
+        id_citacion = await insertCitacion(citacion.get('citacion'), citacion.get('id_caso'))
+        res = await insertCitado(citacion.get('citados'), id_citacion= id_citacion)
+        if (res):
+            session.close()
+            return {"status":1}
+        else:
+            return {"status":0, "message":"No se puede generar mas citaciones..."}
+    except Exception as e:
+        return {"status":0, "message":"Ha ocurido un error en el servidor..."}
+    

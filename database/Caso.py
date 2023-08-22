@@ -60,4 +60,6 @@ async def modificarCaso(caso):
         return False
 
 
-    
+async def getCaso(id_caso)->Caso:
+    caso = session.query(Caso).filter_by(id_caso = id_caso).first()
+    return caso
