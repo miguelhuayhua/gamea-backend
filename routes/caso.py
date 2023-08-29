@@ -2,10 +2,11 @@ from database.Caso import getUltimoCaso, allCasos, cambiarEstado, modificarCaso,
 from database.AdultoMayor import listarAdulto
 from database.Seguimiento import insertSeguimiento, allSeguimientoByCaso
 from database.Hijo import listarHijos
-from database.Citacion import allCitacionByCaso, insertCitacion
-from database.Citado import insertCitado
+from database.Citacion import allCitacionByCaso, insertCitacion, suspenderCitacion
+from database.Citado import insertCitado, getCitadosByIdCitacion
+from database.Audiencia import insertAudiencia
 from fastapi import APIRouter, Request
-
+from fastapi.responses import JSONResponse
 from database.conexion import session
 from fastapi.responses import FileResponse
 import tempfile
@@ -124,16 +125,24 @@ async def allCaso(request:Request):
 async def allCitacion(request:Request):
     data = await request.json()
     id_caso = data.get('id_caso')
-    citacions = await allCitacionByCaso(id_caso)
+    citaciones = await allCitacionByCaso(id_caso)
+    
     session.close()
-    return citacions
+    return citaciones
+
+@routerCaso.post('/citados/get')
+async def getCitados(request:Request):
+    data = await request.json()
+    citados = await getCitadosByIdCitacion(data.get('id_citacion'))
+    session.close()
+    return citados
+
 
 @routerCaso.post('/citacion/add')
 async def addCitacion(request:Request):
     try:
-        print(await request.json())
         citacion = await request.json()
-        id_citacion = await insertCitacion(citacion.get('citacion'), citacion.get('id_caso'))
+        id_citacion = await insertCitacion(citacion.get('citacion'), citacion.get('id_caso'), citacion.get('numero'))
         res = await insertCitado(citacion.get('citados'), id_citacion= id_citacion)
         if (res):
             session.close()
@@ -142,4 +151,25 @@ async def addCitacion(request:Request):
             return {"status":0, "message":"No se puede generar mas citaciones..."}
     except Exception as e:
         return {"status":0, "message":"Ha ocurido un error en el servidor..."}
-    
+
+
+#AUDIENCIAS SUSPENDIDAS
+
+@routerCaso.post('/audiencia/add')
+async def addCitacion(request:Request):
+    try:
+        
+        data = await request.json()
+        id_citacion = data.get('id_citacion')
+        if(await insertAudiencia(data.get('audiencia'), id_citacion=id_citacion)):
+            await suspenderCitacion(id_citacion)
+            session.close()
+            return {"status":1,"message": "Audiencia suspendida correctamente"}
+
+        else:
+            session.close()
+            return {"status":0,"message": "No se pudo suspender la audiencia debido a un error..."}
+    except Exception as e:
+        print(e)
+        return {"status":0, "message":"Ha ocurido un error en el servidor..."}
+

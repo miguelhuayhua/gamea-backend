@@ -14,6 +14,7 @@ class Citacion(Base):
     fecha_citacion = Column(String)
     numero = Column(Integer)
     hora_citacion = Column(String)
+    suspendido = Column(Integer)
     ult_modificacion = Column(DateTime, default=func.now())
     estado = Column(Integer, default=1)
     @classmethod
