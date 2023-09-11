@@ -50,10 +50,18 @@ async def cambiarEstado(id_denunciado):
     return True
 
 async def modificarDenunciado(denunciado):
-    nombre_apellidos = Denunciado.get('nombres_apellidos')
-    genero = Denunciado.get('genero')
-    denunciadoUpdated = session.query(denunciado).filter_by(id_denunciado=denunciado.get('id_denunciado')).first()
-    denunciadoUpdated.nombre_apellidos = nombre_apellidos
+    nombres = denunciado.get('nombres')
+    paterno = denunciado.get('paterno')
+    materno = denunciado.get('materno')
+    genero = denunciado.get('genero')
+    ci = denunciado.get('ci')
+    expedido = denunciado.get('expedido')
+    denunciadoUpdated = session.query(Denunciado).filter_by(id_denunciado=denunciado.get('id_denunciado')).first()
+    denunciadoUpdated.nombres = nombres
+    denunciadoUpdated.paterno = paterno
+    denunciadoUpdated.materno = materno
+    denunciadoUpdated.ci = ci
+    denunciadoUpdated.expedido= expedido
     denunciadoUpdated.genero = genero
     session.commit()
     return denunciadoUpdated.id_denunciado

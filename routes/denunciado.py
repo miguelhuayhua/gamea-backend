@@ -1,4 +1,4 @@
-from database.Denunciado import getDenunciadoByCaso, cambiarEstado, listarDenunciados, getDenunciado
+from database.Denunciado import getDenunciadoByCaso, cambiarEstado, listarDenunciados, getDenunciado, modificarDenunciado
 
 from fastapi import APIRouter, Request
 from database.conexion import session
@@ -47,3 +47,15 @@ async def changeEstado(request:Request):
         return {"status":1}
     except:
         return {"status":0}
+    
+@routerDenunciado.post('/update')
+async def updateDenunciado(request:Request):
+    try:
+        denunciado = await request.json()
+        await modificarDenunciado(denunciado=denunciado)
+        session.close()
+        return {"status":1, "message":"Denunciado modificado con éxito..."}
+    except Exception as e:
+        print(e)
+        session.close()
+        return {"status":0, "message":"Ha ocurrido un error en el servidor..."}
