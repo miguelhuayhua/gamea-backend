@@ -158,7 +158,6 @@ async def addCitacion(request:Request):
 @routerCaso.post('/audiencia/add')
 async def addCitacion(request:Request):
     try:
-        
         data = await request.json()
         id_citacion = data.get('id_citacion')
         if(await insertAudiencia(data.get('audiencia'), id_citacion=id_citacion)):

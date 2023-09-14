@@ -67,6 +67,7 @@ async def modificarPersona(persona):
     personaUpdated.celular = celular
     personaUpdated.f_nacimiento = f_nacimiento 
     personaUpdated.cargo = cargo
+    personaUpdated.genero = genero
     session.commit()
     return personaUpdated.id_persona
  

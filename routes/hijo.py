@@ -1,4 +1,7 @@
 
+import tempfile
+
+from fastapi.responses import FileResponse
 from database.Hijo import listarHijos, getHijo, cambiarEstado, modificarHijo
 from fastapi import APIRouter, Request
 import pandas as pd
@@ -49,3 +52,23 @@ async def updateHijo(request:Request):
     except Exception as e:
         print(e)
         return {"status":0}
+    
+
+@routerHijo.get('/report')
+async def reportHijo():
+    dataHijo = await listarHijos()
+    hijo = []
+    for value in dataHijo:
+        dict = value.__dict__
+        dict.pop('_sa_instance_state')
+        hijo.append(dict)
+    dataframeHijo = pd.DataFrame.from_records(hijo)
+    dataframeHijo['ult_modificacion'] = dataframeHijo['ult_modificacion'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    
+      # Crea un archivo temporal
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Guarda el DataFrame en el archivo temporal en formato Excel
+        dataframeHijo.to_excel(temp_file.name, sheet_name='hijos', index=False, engine='xlsxwriter')
+
+    # Envía el archivo como respuesta utilizando FileResponse
+    return FileResponse(temp_file.name, filename='archivo.xlsx')

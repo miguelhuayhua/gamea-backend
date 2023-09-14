@@ -1,3 +1,6 @@
+import tempfile
+
+from fastapi.responses import FileResponse
 from database.AdultoMayor import listarAdulto, getAdulto, cambiarEstado, modificarAdulto
 from database.Hijo import getHijosByIdAdulto
 from fastapi import APIRouter, Request
@@ -69,3 +72,23 @@ async def updateAdulto(request:Request):
         return {"status":1}
     except:
         return {"status":0}
+    
+
+@routerAdulto.get('/report')
+async def reportAdulto():
+    dataAdulto = await listarAdulto()
+    personal = []
+    for adulto in dataAdulto:
+        dict = adulto.__dict__
+        dict.pop('_sa_instance_state')
+        personal.append(dict)
+    dataframeAdulto = pd.DataFrame.from_records(personal)
+    dataframeAdulto['ult_modificacion'] = dataframeAdulto['ult_modificacion'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    
+      # Crea un archivo temporal
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Guarda el DataFrame en el archivo temporal en formato Excel
+        dataframeAdulto.to_excel(temp_file.name, sheet_name='adultos', index=False, engine='xlsxwriter')
+
+    # Envía el archivo como respuesta utilizando FileResponse
+    return FileResponse(temp_file.name, filename='archivo.xlsx')

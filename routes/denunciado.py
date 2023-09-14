@@ -1,3 +1,7 @@
+import tempfile
+
+from fastapi.responses import FileResponse
+import pandas as pd
 from database.Denunciado import getDenunciadoByCaso, cambiarEstado, listarDenunciados, getDenunciado, modificarDenunciado
 
 from fastapi import APIRouter, Request
@@ -59,3 +63,22 @@ async def updateDenunciado(request:Request):
         print(e)
         session.close()
         return {"status":0, "message":"Ha ocurrido un error en el servidor..."}
+
+@routerDenunciado.get('/report')
+async def reportDenunciado():
+    dataDenunciado = await listarDenunciados()
+    denunciado = []
+    for value in dataDenunciado:
+        dict = value.__dict__
+        dict.pop('_sa_instance_state')
+        denunciado.append(dict)
+    dataframeDenunciado = pd.DataFrame.from_records(denunciado)
+    dataframeDenunciado['ult_modificacion'] = dataframeDenunciado['ult_modificacion'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    
+      # Crea un archivo temporal
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Guarda el DataFrame en el archivo temporal en formato Excel
+        dataframeDenunciado.to_excel(temp_file.name, sheet_name='denunciados', index=False, engine='xlsxwriter')
+
+    # Envía el archivo como respuesta utilizando FileResponse
+    return FileResponse(temp_file.name, filename='archivo.xlsx')

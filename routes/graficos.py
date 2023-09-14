@@ -17,6 +17,8 @@ async def chartDashboard(request: Request):
     data3 = session.execute("SELECT * FROM casos_x_mes()").fetchall()
     data4 = session.execute("SELECT * FROM conteo_tipologia()").fetchall()
     data5 = session.execute("SELECT * FROM genero_x_casos()").fetchall()
+    data6 = session.execute("SELECT * FROM rango_edades()").fetchall()
+    rango_edades = {"rango_edades":[value[0] for value in data6], "cantidad":[value[1] for value in data6]}
     casos_x_mes_actual = session.execute("SELECT * FROM casos_x_mes_actual()").fetchall()[0]['cantidad']
     casos_x_dia = session.execute("SELECT * FROM casos_x_dia()").fetchall()[0]['cantidad']
     citaciones_x_mes = session.execute("SELECT * FROM citaciones_x_mes()").fetchall()[0]['cantidad']
@@ -30,4 +32,5 @@ async def chartDashboard(request: Request):
     session.close()
     return {"caso_x_distrito":caso_x_distrito, "acciones_x_casos":acciones_x_casos, "casos_x_mes":casos_x_mes, "conteo_tipologia":conteo_tipologia,
             "casos_x_genero":genero_x_casos, "suspendidos_x_mes":suspendidos_x_mes, "casos_x_dia": casos_x_dia, "casos_x_mes_actual":casos_x_mes_actual,
-            "citaciones_x_mes":citaciones_x_mes, "proximas_citaciones":proximas_citaciones}
+            "citaciones_x_mes":citaciones_x_mes, "proximas_citaciones":proximas_citaciones,
+            "rango_edades":rango_edades}

@@ -20,3 +20,5 @@ class Usuario(Base):
         next_value = engine.execute(
             select(func.nextval('sec_id_usuario'))).scalar()
         return f"P-{next_value}"
+    def exclude_fields(self):
+        return ['password']

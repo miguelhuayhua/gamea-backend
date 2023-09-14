@@ -1,4 +1,7 @@
 
+import tempfile
+
+from fastapi.responses import FileResponse
 from database.Persona import cambiarEstado, insertPersona, listarPersonas , getPersona, modificarPersona
 from fastapi import APIRouter, Request
 import pandas as pd
@@ -62,3 +65,23 @@ async def insertarPersona(request:Request):
     except Exception as e:
         print(e)
         return {"status":0}
+    
+       
+@routerPersona.get('/report')
+async def reportPersona():
+    dataPersona = await listarPersonas()
+    personal = []
+    for usuario in dataPersona:
+        dict = usuario.__dict__
+        dict.pop('_sa_instance_state')
+        personal.append(dict)
+    dataframePersona = pd.DataFrame.from_records(personal)
+    dataframePersona['ult_modificacion'] = dataframePersona['ult_modificacion'].dt.strftime('%Y-%m-%d %H:%M:%S')    
+    
+      # Crea un archivo temporal
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Guarda el DataFrame en el archivo temporal en formato Excel
+        dataframePersona.to_excel(temp_file.name, sheet_name='usuarios', index=False, engine='xlsxwriter')
+
+    # Envía el archivo como respuesta utilizando FileResponse
+    return FileResponse(temp_file.name, filename='archivo.xlsx')
