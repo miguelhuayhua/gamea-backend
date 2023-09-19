@@ -2,7 +2,7 @@
 import tempfile
 
 from fastapi.responses import FileResponse
-from database.Usuario import insertUsuario, verifyUsuario, cambiarEstado, listarUsuarios, modificarUsuario,getUsuario, getByNameAndPassword
+from database.Usuario import insertUsuario, verifyUsuario, cambiarEstado, listarUsuarios, modificarUsuario,getUsuario, getByNameAndPassword, getAccionesById, getAccesosById, logOut
 from fastapi import APIRouter, Request
 import pandas as pd
 from database.conexion import session
@@ -10,21 +10,16 @@ routerUsuario = APIRouter()
 
 
 # creamos las diferentes rutas de manejo para cada usuario
-
-
-
-
-
 @routerUsuario.post('/verify')
 async def obtenerusuario(request: Request):
     data = await request.json()
     if await verifyUsuario(usuario = data):
+        session.close()
         return {"status":0}
     else:
+        session.close()
         return {"status":1}
     
-
-
 @routerUsuario.get('/all')
 async def allusuarios():
     usuarios = await listarUsuarios()
@@ -44,6 +39,7 @@ async def changeEstado(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 
@@ -56,6 +52,7 @@ async def updateusuario(request:Request):
         session.close()
         return {"status":1}
     except Exception as e:
+        session.close()
         print(e)
         return {"status":0}
     
@@ -64,13 +61,26 @@ async def obtenerUsuario(request: Request):
     data = await request.json()
     id_usuario  = data.get('id_usuario')
     usuario = await getUsuario(id_usuario= id_usuario)
+    session.close()
     return usuario
 
 @routerUsuario.post('/auth')
 async def authUsuario(request: Request):
     data = await request.json()
     usuario = await getByNameAndPassword(data)
+    session.close()
     return usuario
+
+@routerUsuario.post('/out')
+async def authUsuario(request: Request):
+    data = await request.json()
+    id_usuario = data.get('id_usuario')
+    if(await logOut(id_usuario=id_usuario)):
+        session.close()
+        return {"status":1}
+    else:
+        session.close()
+        return None
 
 
 @routerUsuario.post('/insert')
@@ -82,8 +92,32 @@ async def insertarUsuario(request:Request):
         return {"status":1}
     except Exception as e:
         print(e)
+        session.close()
         return {"status":0}
 
+@routerUsuario.post('/getAccionesById')
+async def getAccionesByIdF(request:Request):
+    try:
+        usuario = await request.json()
+        acciones = await getAccionesById(usuario.get('id_usuario'))
+        session.close()
+        return acciones
+    except Exception as e:
+        print(e)
+        session.close()
+        return {"status":0}
+
+@routerUsuario.post('/getAccesosById')
+async def getAccesosByIdF(request:Request):
+    try:
+        usuario = await request.json()
+        accesos = await getAccesosById(usuario.get('id_usuario'))
+        session.close()
+        return accesos
+    except Exception as e:
+        print(e)
+        session.close()
+        return {"status":0}
 
            
 @routerUsuario.get('/report')
@@ -102,6 +136,6 @@ async def reportUsuario():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         dataframeUsuarios.to_excel(temp_file.name, sheet_name='usuarios', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')

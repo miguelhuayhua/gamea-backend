@@ -1,4 +1,4 @@
-from database.Caso import getUltimoCaso, allCasos, cambiarEstado, modificarCaso,getCaso
+from database.Caso import getUltimoCaso, allCasos, cambiarEstado, modificarCaso,getCaso, generaActaCompromiso
 from database.AdultoMayor import listarAdulto
 from database.Seguimiento import insertSeguimiento, allSeguimientoByCaso
 from database.Hijo import listarHijos
@@ -6,7 +6,7 @@ from database.Citacion import allCitacionByCaso, insertCitacion, suspenderCitaci
 from database.Citado import insertCitado, getCitadosByIdCitacion
 from database.Audiencia import insertAudiencia
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+
 from database.conexion import session
 from fastapi.responses import FileResponse
 import tempfile
@@ -30,6 +30,7 @@ async def obtenercaso(request: Request):
     data = await request.json()
     id_caso  = data.get('id_caso')
     caso = await getCaso(id_caso=id_caso)
+    session.close()
     return caso
 
 
@@ -49,6 +50,7 @@ async def changeEstado(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 
@@ -60,6 +62,7 @@ async def updateCaso(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 @routerCaso.get('/report')
@@ -94,7 +97,7 @@ async def reportCaso():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         unido1.to_excel(temp_file.name, sheet_name='hoja1', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')
 
@@ -109,6 +112,7 @@ async def addCaso(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 @routerCaso.post('/seguimiento/all')
@@ -126,7 +130,6 @@ async def allCitacion(request:Request):
     data = await request.json()
     id_caso = data.get('id_caso')
     citaciones = await allCitacionByCaso(id_caso)
-    
     session.close()
     return citaciones
 
@@ -148,8 +151,10 @@ async def addCitacion(request:Request):
             session.close()
             return {"status":1}
         else:
+            session.close()
             return {"status":0, "message":"No se puede generar mas citaciones..."}
     except Exception as e:
+        session.close()
         return {"status":0, "message":"Ha ocurido un error en el servidor..."}
 
 
@@ -170,5 +175,22 @@ async def addCitacion(request:Request):
             return {"status":0,"message": "No se pudo suspender la audiencia debido a un error..."}
     except Exception as e:
         print(e)
+        session.close()
+        return {"status":0, "message":"Ha ocurido un error en el servidor..."}
+
+#ACTA COMPROMISO
+@routerCaso.post("/acta-compromiso")
+async def generarActaCompromiso(request:Request):
+    try:
+        data = await request.json()
+        if(await generaActaCompromiso(data.get('id_caso'), data.get('compromisos'),data.get('denunciado')) ):
+            session.close()
+            return {"status":1}
+        else:
+            session.close()
+            return {"status":0, "message":"No se pudo insertar los datos..."}
+    except Exception as e:
+        print(e)
+        session.close()
         return {"status":0, "message":"Ha ocurido un error en el servidor..."}
 

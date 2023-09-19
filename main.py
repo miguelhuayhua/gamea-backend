@@ -41,6 +41,8 @@ app.include_router(routerPersona , prefix='/persona')
 app.include_router(routerUsuario , prefix='/usuario')
 app.include_router(routerPredicciones, prefix='/ml')
 app.include_router(routerGraficos, prefix="/charts")
+
+
 app.mount("/public", StaticFiles(directory=os.path.join(os.getcwd(), "public")), name="public")
 @app.get("/static/images/{image_name}")
 def get_image_url(image_name:str):

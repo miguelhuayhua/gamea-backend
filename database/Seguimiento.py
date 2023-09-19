@@ -9,7 +9,7 @@ async def insertSeguimiento(data, id_caso):
     fecha_seguimiento = data.get('fecha_seguimiento')
     detalle_seguimiento = data.get('detalle_seguimiento')
     hora_seguimiento = data.get('hora_seguimiento')
-    size = await len(allSeguimientoByCaso(id_caso))
+    size = len(await allSeguimientoByCaso(id_caso))
     if(size<4):
         seguimiento = Seguimiento(detalle_seguimiento = detalle_seguimiento, id_seguimiento = Seguimiento.generate_id(),
                               id_caso = id_caso, fecha_seguimiento = fecha_seguimiento, hora_seguimiento = hora_seguimiento)

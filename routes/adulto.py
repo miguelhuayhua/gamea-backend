@@ -31,6 +31,7 @@ async def all():
         session.close()
         return {'nombres': nombres.tolist(), 'apellidos': apellidos.tolist()}
     else:
+        session.close()
         return {'nombres': [], 'apellidos':[]}
 
 
@@ -59,6 +60,7 @@ async def changeEstado(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 
@@ -71,6 +73,7 @@ async def updateAdulto(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 
@@ -89,6 +92,6 @@ async def reportAdulto():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         dataframeAdulto.to_excel(temp_file.name, sheet_name='adultos', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')

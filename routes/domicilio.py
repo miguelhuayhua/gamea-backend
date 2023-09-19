@@ -25,6 +25,7 @@ async def updateDomicilio(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 @routerDomicilio.post('/getByIdAdulto')
@@ -44,4 +45,5 @@ async def insertDomicilio(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}

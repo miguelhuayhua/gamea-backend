@@ -8,8 +8,8 @@ async def insertarDomicilio(data, id_adulto):
         d.actual = 0
     distrito = data.get('distrito')
     zona = data.get('zona')
-    calle_av = data.get('calle_av')
-    nro_vivienda = data.get('nro_vivienda')
+    calle_av = data.get('calle')
+    nro_vivienda = data.get('n_vivienda')
     area = data.get('area')
     tipo_domicilio = data.get('tipo_domicilio')
     otro_domicilio = data.get('otro_domicilio')
@@ -65,5 +65,5 @@ async def modificarDomicilio(domicilio):
     return domicilioUpdated.id_domicilio
  
 async def obtenerDomicilioByIdAdulto(id_adulto):
-    domicilios = session.query(Domicilio).filter_by(id_adulto = id_adulto).all()
+    domicilios = session.query(Domicilio).filter_by(id_adulto = id_adulto).first()
     return domicilios

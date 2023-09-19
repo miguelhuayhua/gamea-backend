@@ -79,6 +79,6 @@ async def reportDenunciado():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         dataframeDenunciado.to_excel(temp_file.name, sheet_name='denunciados', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')

@@ -19,7 +19,7 @@ async def insertAdulto(data):
     paterno = data.get('paterno').strip().capitalize()
     nombre = data.get('nombre').strip().capitalize()
     nro_referencia = data.get('referencia')
-    genero = data.get('sexo')
+    genero = data.get('genero')
     beneficios = data.get('beneficios')
     ocupacion = data.get('ocupacion')
     adultoMayor = AdultoMayor(id_adulto=AdultoMayor.generate_id(), ci=ci, edad=edad, estado_civil=estado_civil, f_nacimiento=f_nacimiento,  paterno=paterno,
@@ -29,7 +29,6 @@ async def insertAdulto(data):
 
     session.add(adultoMayor)
     session.commit()
-    print('se añadió con éxito')
     return adultoMayor.id_adulto
 
 

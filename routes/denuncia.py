@@ -35,5 +35,6 @@ async def insertDenuncia(request: Request):
         session.close()
         return {"response": "Los datos se han registrado correctamente...", "status": 1}
     except Exception as e:
+        session.close()
         print(e)
         return {"response": "Ha ocurrido un error en el servidor...", "status": 0}

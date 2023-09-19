@@ -58,11 +58,13 @@ async def updatepersona(request:Request):
 @routerPersona.post('/insert')
 async def insertarPersona(request:Request):
     try:
+        print(await request.json())
         persona = await request.json()
         id_persona = await insertPersona(data=  persona)
         session.close()
         return {"status":1, 'id_persona' : id_persona}
     except Exception as e:
+        session.close()
         print(e)
         return {"status":0}
     
@@ -82,6 +84,6 @@ async def reportPersona():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         dataframePersona.to_excel(temp_file.name, sheet_name='usuarios', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')

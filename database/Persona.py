@@ -1,11 +1,8 @@
 # base de datos
-
-from dateutil.parser import parse
 from sqlalchemy import desc
 from database.conexion import session
 from models.Persona import Persona
 
-import genderize
 
 async def insertPersona(data):
     nombres = data.get('nombres').capitalize()

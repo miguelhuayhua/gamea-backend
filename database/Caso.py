@@ -4,6 +4,8 @@ from dateutil.parser import parse
 from database.conexion import session
 from models.Caso import Caso
 from sqlalchemy import desc
+from models.ActaCompromiso import ActaCompromiso
+from models.Denunciado import Denunciado
 
 async def insertCaso(data, id_adulto):
     fecha_registro = data.get('fecha_registro')
@@ -63,3 +65,18 @@ async def modificarCaso(caso):
 async def getCaso(id_caso)->Caso:
     caso = session.query(Caso).filter_by(id_caso = id_caso).first()
     return caso
+
+
+async def generaActaCompromiso(id_caso, compromisos, denunciado):
+    caso = session.query(Caso).filter_by(id_caso = id_caso).first()
+    caso.estado = 0
+    for value in compromisos:
+        c = ActaCompromiso(compromiso = value.get('compromiso'), id_caso = id_caso,
+                           id_compromiso = ActaCompromiso.generate_id())
+        session.add(c)
+        session.commit()
+    d = session.query(Denunciado).filter_by(id_denunciado = denunciado.get('id_denunciado')).first()
+    d.ci = denunciado.get('ci')
+    d.expedido = denunciado.get('expedido')
+    session.commit()
+    return True

@@ -19,6 +19,6 @@ class Usuario(Base):
     def generate_id(cls):
         next_value = engine.execute(
             select(func.nextval('sec_id_usuario'))).scalar()
-        return f"P-{next_value}"
+        return f"U-{next_value}"
     def exclude_fields(self):
         return ['password']

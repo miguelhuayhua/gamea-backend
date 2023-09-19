@@ -25,7 +25,6 @@ async def allCitacionByCaso(id_caso):
     return citaciones
 
 async def suspenderCitacion(id_citacion):
-    print(id_citacion)
     citacion = session.query(Citacion).filter_by(id_citacion = id_citacion).first()
     citacion.suspendido = 1
     session.commit()

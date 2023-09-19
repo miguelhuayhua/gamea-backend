@@ -20,6 +20,7 @@ async def obtenerHijo(request: Request):
     data = await request.json()
     id_hijo  = data.get('id_hijo')
     hijo = await getHijo(id_hijo=id_hijo)
+    session.close()
     return hijo
 
 
@@ -37,7 +38,9 @@ async def changeEstado(request:Request):
         await cambiarEstado(id_hijo=id_hijo)
         session.close()
         return {"status":1}
-    except:
+    except Exception as e:
+        session.close()
+        print(e)
         return {"status":0}
     
 
@@ -50,6 +53,7 @@ async def updateHijo(request:Request):
         session.close()
         return {"status":1}
     except Exception as e:
+        session.close()
         print(e)
         return {"status":0}
     
@@ -69,6 +73,6 @@ async def reportHijo():
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         # Guarda el DataFrame en el archivo temporal en formato Excel
         dataframeHijo.to_excel(temp_file.name, sheet_name='hijos', index=False, engine='xlsxwriter')
-
+    session.close()
     # Envía el archivo como respuesta utilizando FileResponse
     return FileResponse(temp_file.name, filename='archivo.xlsx')
