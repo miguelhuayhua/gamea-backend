@@ -5,10 +5,11 @@ from models.Persona import Persona
 
 
 async def insertPersona(data):
-    nombres = data.get('nombres').capitalize()
-    paterno = data.get('paterno').capitalize()
-    materno = data.get('materno').capitalize()
-    profesion = data.get('profesion')
+    nombres = data.get('nombres').capitalize().strip()
+    paterno = data.get('paterno').capitalize().strip()
+    materno = data.get('materno').capitalize().strip()
+    profesion = data.get('profesion').capitalize().strip()
+    expedido = data.get('expedido')
     ci = data.get('ci')
     celular = data.get('celular')
     f_nacimiento = data.get('f_nacimiento')
@@ -16,7 +17,8 @@ async def insertPersona(data):
     genero = data.get('genero')
     persona = Persona(nombres = nombres, paterno = paterno, materno = materno, ci = ci, celular = celular, 
                       profesion= profesion,
-                      f_nacimiento = f_nacimiento, cargo = cargo , genero = genero, id_persona = Persona.generate_id())
+                      f_nacimiento = f_nacimiento, cargo = cargo , genero = genero, id_persona = Persona.generate_id(),
+                      expedido = expedido)
     session.add(persona)
     session.commit()
     return persona.id_persona
@@ -46,10 +48,11 @@ async def cambiarEstado(id_persona):
     return True
 
 async def modificarPersona(persona):
-    nombres = persona.get('nombres')
-    paterno = persona.get('paterno')
-    materno = persona.get('materno')
-    profesion = persona.get('profesion')
+    nombres = persona.get('nombres').capitalize().strip()
+    paterno = persona.get('paterno').capitalize().strip()
+    materno = persona.get('materno').capitalize().strip()
+    profesion = persona.get('profesion').capitalize().strip()
+    expedido = persona.get('expedido')
     ci = persona.get('ci')
     celular = persona.get('celular')
     f_nacimiento = persona.get('f_nacimiento')
@@ -60,6 +63,7 @@ async def modificarPersona(persona):
     personaUpdated.paterno = paterno
     personaUpdated.materno = materno
     personaUpdated.ci = ci
+    personaUpdated.expedido = expedido
     personaUpdated.profesion = profesion
     personaUpdated.celular = celular
     personaUpdated.f_nacimiento = f_nacimiento 

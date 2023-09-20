@@ -14,7 +14,7 @@ async def insertUsuario(data):
     file_path = os.path.join(file.filename)
     file_path = file_path.replace(' ','')
     file_path = file_path.lower()
-    with open("public/usersimg/"+ file.filename, "wb") as f:
+    with open("public/usersimg/"+ file_path, "wb") as f:
             contents = await file.read()
             f.write(contents)
     usuario_name = data.get('usuario')
@@ -75,10 +75,10 @@ async def modificarUsuario(usuario):
         file_path = os.path.join(file.filename)
         file_path = file_path.replace(' ','')
         file_path = file_path.lower()
-        with open("public/usersimg/"+ file.filename, "wb") as f:
+        with open("public/usersimg/"+ file_path, "wb") as f:
             contents = await file.read()
             f.write(contents)
-        usuarioUpdated.fotografia = f"/static/images/{file_path}", 
+        usuarioUpdated.fotografia = f"/static/images/{file_path}"
     if(usuario.get('password')!='' and usuario.get('password')!=None):
         usuarioUpdated.password = usuario.get('password')
     usuarioUpdated.usuario = usuario.get('usuario')
@@ -96,13 +96,14 @@ async def getAccesosById(id_usuario):
 
 async def getByNameAndPassword(usuario):    
     try:
-        usuario_name = usuario.get('usuario')
-        password = usuario.get('password')
-        result = None
+        usuario_name = usuario.get('usuario')+"".strip()
+        password = usuario.get('password')+"".strip()
         if(usuario_name and password):
+            print('hola')
             b_password = password.encode('utf-8')
             result = session.query(Usuario).filter_by(usuario = usuario_name).first()
             if bcrypt.checkpw(b_password,result.password.encode('utf-8')):
+                print('sí')
                 acceso = Acceso(id_usuario = result.id_usuario , id_acceso = Acceso.generate_id())
                 session.add(acceso)
                 session.commit()

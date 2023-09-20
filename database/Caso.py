@@ -6,7 +6,7 @@ from models.Caso import Caso
 from sqlalchemy import desc
 from models.ActaCompromiso import ActaCompromiso
 from models.Denunciado import Denunciado
-
+from sqlalchemy import and_
 async def insertCaso(data, id_adulto):
     fecha_registro = data.get('fecha_registro')
     tipologia = data.get('tipologia')
@@ -63,7 +63,7 @@ async def modificarCaso(caso):
 
 
 async def getCaso(id_caso)->Caso:
-    caso = session.query(Caso).filter_by(id_caso = id_caso).first()
+    caso = session.query(Caso).filter(and_(Caso.id_caso ==id_caso, Caso.estado == 1)).first()
     return caso
 
 

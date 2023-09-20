@@ -15,6 +15,7 @@ class Persona(Base):
     genero = Column(String)
     profesion = Column(String)
     ci = Column(Integer)
+    expedido = Column(String)
     celular = Column(Integer)
     f_nacimiento = Column(Date)
     cargo = Column(String)

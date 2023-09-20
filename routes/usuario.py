@@ -1,4 +1,5 @@
 
+import os
 import tempfile
 
 from fastapi.responses import FileResponse
@@ -6,6 +7,7 @@ from database.Usuario import insertUsuario, verifyUsuario, cambiarEstado, listar
 from fastapi import APIRouter, Request
 import pandas as pd
 from database.conexion import session
+from models.Usuario import Usuario
 routerUsuario = APIRouter()
 
 
@@ -64,12 +66,51 @@ async def obtenerUsuario(request: Request):
     session.close()
     return usuario
 
+@routerUsuario.post('/fotografia')
+async def fotografiaUsuario(request: Request):
+    data = await request.form()
+    id_usuario = data.get('id_usuario')
+    usuario = await getUsuario(id_usuario= id_usuario)
+    print(usuario.id_usuario)
+    file = data.get('fotografia')
+    if(file != 'null'):
+        print(file.filename)
+        file_path = os.path.join(file.filename)
+        file_path = file_path.replace(' ','')
+        file_path = file_path.lower()
+        with open("public/usersimg/"+ file_path, "wb") as f:
+            contents = await file.read()
+            f.write(contents)
+        usuario.fotografia = f"/static/images/{file_path}"
+    session.commit()
+    session.close()
+    return {"status":1}
+
+    
+@routerUsuario.post('/username')
+async def usrName(request: Request):
+    data = await request.json()
+    id_usuario = data.get('id_usuario')
+    username = data.get('usuario')
+    usuario = await getUsuario(id_usuario= id_usuario)
+    if(session.query(Usuario).filter_by(usuario = username).all()):
+        session.close()
+        return {"message":"Usuario en uso...","status":0}
+    else:
+        usuario.usuario = username
+        session.commit()
+        session.close()        
+        return {"message":"Usuario modificado con éxito!, reinicie su sesión para ver cambios...","status":1}
+
+
 @routerUsuario.post('/auth')
 async def authUsuario(request: Request):
     data = await request.json()
     usuario = await getByNameAndPassword(data)
     session.close()
     return usuario
+
+
 
 @routerUsuario.post('/out')
 async def authUsuario(request: Request):

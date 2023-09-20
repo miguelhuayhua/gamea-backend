@@ -38,6 +38,7 @@ async def changeEstado(request:Request):
         session.close()
         return {"status":1}
     except:
+        session.close()
         return {"status":0}
     
 
@@ -50,6 +51,7 @@ async def updatepersona(request:Request):
         session.close()
         return {"status":1}
     except Exception as e:
+        session.close()
         print(e)
         return {"status":0}
     
@@ -58,7 +60,6 @@ async def updatepersona(request:Request):
 @routerPersona.post('/insert')
 async def insertarPersona(request:Request):
     try:
-        print(await request.json())
         persona = await request.json()
         id_persona = await insertPersona(data=  persona)
         session.close()
