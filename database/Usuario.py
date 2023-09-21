@@ -99,15 +99,12 @@ async def getByNameAndPassword(usuario):
         usuario_name = usuario.get('usuario')+"".strip()
         password = usuario.get('password')+"".strip()
         if(usuario_name and password):
-            print('hola')
             b_password = password.encode('utf-8')
             result = session.query(Usuario).filter_by(usuario = usuario_name).first()
             if bcrypt.checkpw(b_password,result.password.encode('utf-8')):
-                print('sí')
                 acceso = Acceso(id_usuario = result.id_usuario , id_acceso = Acceso.generate_id())
                 session.add(acceso)
                 session.commit()
-                print(result.id_usuario, ">--- esto")
                 if(result.estado == 1):
                     return result
                 else:
@@ -122,7 +119,6 @@ async def getByNameAndPassword(usuario):
 
 
 async def logOut(id_usuario):
-    print(id_usuario)
     usuarioUpdated = session.query(Acceso).filter_by(id_usuario = id_usuario).order_by(desc(Acceso.id_acceso)).first()
     
     usuarioUpdated.fecha_hora_salida = func.now()

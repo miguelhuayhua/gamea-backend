@@ -71,10 +71,8 @@ async def fotografiaUsuario(request: Request):
     data = await request.form()
     id_usuario = data.get('id_usuario')
     usuario = await getUsuario(id_usuario= id_usuario)
-    print(usuario.id_usuario)
     file = data.get('fotografia')
     if(file != 'null'):
-        print(file.filename)
         file_path = os.path.join(file.filename)
         file_path = file_path.replace(' ','')
         file_path = file_path.lower()
